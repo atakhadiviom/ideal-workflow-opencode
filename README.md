@@ -1,24 +1,17 @@
 # ideal-workflow-opencode
 
-**Plan → Build → Review** pipeline with automatic model switching per mode.
+Interactive model selector for OpenCode's Plan → Build → Review pipeline.
 
-No trigger phrases needed. Just use OpenCode normally — models switch automatically based on the mode you're in.
+When you install, it asks you to pick a model for each phase from all your
+available OpenCode Go models.
 
 ## Model routing
 
-| When you... | Mode | Default | Alternative |
-|---|---|---|---|
-| Hit **Tab** to Plan mode | Plan | GLM-5.1 | Kimi K2.6 |
-| Start typing (Build mode) | Build | MiniMax M2.7 | DeepSeek V4 Pro |
-| Say "review", "debug", "test", "check" | @ideal-review | Qwen3.6+ | — |
-
-## How it works
-
-Three mechanisms work together:
-
-1. **Built-in `plan` agent overridden** — uses GLM-5.1 (or Kimi K2.6) + architecture prompt (read-only)
-2. **Built-in `build` agent overridden** — uses MiniMax M2.7 (or DeepSeek V4 Pro) + implementation prompt
-3. **`@ideal-review` subagent** — Qwen3.6+ invoked automatically when you ask for review/debug/test
+| Mode | Model |
+|---|---|
+| Plan (Tab) | Your pick (e.g. GLM-5.1, Kimi K2.6) |
+| Build (Tab) | Your pick (e.g. MiniMax M2.7, DeepSeek V4 Pro) |
+| Review/Debug/Test | Your pick (e.g. Qwen3.6+) |
 
 ## Install
 
@@ -26,51 +19,31 @@ Three mechanisms work together:
 curl -fsSL https://raw.githubusercontent.com/atakhadiviom/ideal-workflow-opencode/main/install.sh | bash
 ```
 
-Or clone and run manually:
+You'll be prompted to pick a model for each phase from your available models.
 
-```bash
-git clone https://github.com/atakhadiviom/ideal-workflow-opencode
-cd ideal-workflow-opencode
-./install.sh
-```
+Re-run anytime to swap models.
 
-Restart OpenCode after installing.
+## How it works
 
-## Customize models
-
-Edit `~/.config/opencode/opencode.json`:
-
-```json
-{
-  "agent": {
-    "plan": { "model": "opencode/kimi-k2-6" },
-    "build": { "model": "opencode/deepseek-v4-pro" }
-  }
-}
-```
+- Built-in `plan` agent overridden with your chosen model + architecture prompt
+- Built-in `build` agent overridden with your chosen model + implementation prompt
+- `ideal-review` subagent invoked automatically when you say "review", "debug", "test"
+- Skill auto-detected — no trigger phrases needed
 
 ## Requirements
 
-- OpenCode with Zen or Go plan
-- Run `opencode models opencode` to verify model availability
-
-## Uninstall
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/atakhadiviom/ideal-workflow-opencode/main/uninstall.sh | bash
-```
+- OpenCode Go plan (models are on the `opencode-go` provider)
+- Run `opencode models opencode-go` to see available models
 
 ## Files
 
 ```
 ~/.config/opencode/
-├── opencode.json           # Agent overrides (plan + build models/prompts)
+├── opencode.json           # Generated config with your model picks
 ├── prompts/
-│   ├── plan.txt            # Plan system prompt (read-only)
-│   └── build.txt           # Build system prompt (full access)
-├── agents/
-│   └── ideal-review.md     # Review subagent (read-only, Qwen3.6+)
+│   ├── plan.txt            # Plan system prompt
+│   └── build.txt           # Build system prompt
 └── skills/
     └── ideal-workflow/
-        └── SKILL.md        # Auto-detected, routes debug/test/review
+        └── SKILL.md        # Routes debug/test/review to ideal-review
 ```

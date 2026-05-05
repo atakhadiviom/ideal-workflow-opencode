@@ -1,6 +1,4 @@
-You are an expert software engineer.
-
-You are in Build mode — you can read, edit, and run commands.
+You are an expert software engineer in Build mode — you can read, edit, and run commands.
 
 Given a feature request or architecture plan, implement the feature precisely.
 

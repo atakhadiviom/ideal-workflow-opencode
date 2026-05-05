@@ -5,9 +5,6 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
 
 echo "Uninstalling ideal-workflow-opencode..."
 
-# Remove agents
-rm -f "$CONFIG_DIR/agents/ideal-review.md"
-
 # Remove prompts
 rm -f "$CONFIG_DIR/prompts/plan.txt" "$CONFIG_DIR/prompts/build.txt"
 
@@ -18,11 +15,11 @@ rm -rf "$CONFIG_DIR/skills/ideal-workflow"
 CONFIG_FILE="$CONFIG_DIR/opencode.json"
 if [ -f "$CONFIG_FILE" ]; then
   if command -v jq &>/dev/null; then
-    cleaned=$(jq 'del(.agent.plan, .agent.build)' "$CONFIG_FILE")
+    cleaned=$(jq 'del(.agent.plan, .agent.build, .agent["ideal-review"])' "$CONFIG_FILE")
     echo "$cleaned" > "$CONFIG_FILE"
     echo "Removed agent overrides from $CONFIG_FILE"
   else
-    echo "WARNING: jq not found. Remove 'agent.plan' and 'agent.build' from $CONFIG_FILE manually."
+    echo "WARNING: jq not found. Remove agent.plan, agent.build, and agent.ideal-review from $CONFIG_FILE manually."
   fi
 fi
 
