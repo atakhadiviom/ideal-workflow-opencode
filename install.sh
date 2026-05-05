@@ -17,8 +17,11 @@ if [ -z "$MODELS" ]; then
   exit 1
 fi
 
-# Build arrays (bash 3+ compatible)
-mapfile -t MODEL_IDS <<< "$MODELS"
+# Build arrays (bash 3+ compatible — macOS ships bash 3.2 without mapfile)
+MODEL_IDS=()
+while IFS= read -r line; do
+  MODEL_IDS+=("$line")
+done <<< "$MODELS"
 
 echo ""
 echo "Available models:"
