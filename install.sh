@@ -6,19 +6,43 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
 
 echo "Installing ideal-workflow-opencode..."
 
-mkdir -p "$CONFIG_DIR/agents" "$CONFIG_DIR/skills"
+mkdir -p "$CONFIG_DIR/agents" "$CONFIG_DIR/skills" "$CONFIG_DIR/prompts"
 
-ln -sfn "$REPO_DIR/agents/ideal-plan.md"   "$CONFIG_DIR/agents/ideal-plan.md"
-ln -sfn "$REPO_DIR/agents/ideal-build.md"  "$CONFIG_DIR/agents/ideal-build.md"
+# Agents
 ln -sfn "$REPO_DIR/agents/ideal-review.md" "$CONFIG_DIR/agents/ideal-review.md"
-ln -sfn "$REPO_DIR/skills/ideal-workflow"  "$CONFIG_DIR/skills/ideal-workflow"
 
+# Prompts (used by overridden built-in agents)
+ln -sfn "$REPO_DIR/prompts/plan.txt"  "$CONFIG_DIR/prompts/plan.txt"
+ln -sfn "$REPO_DIR/prompts/build.txt" "$CONFIG_DIR/prompts/build.txt"
+
+# Skill
+ln -sfn "$REPO_DIR/skills/ideal-workflow" "$CONFIG_DIR/skills/ideal-workflow"
+
+# Merge agent overrides into opencode.json
+CONFIG_FILE="$CONFIG_DIR/opencode.json"
+FRAGMENT="$REPO_DIR/opencode.json"
+
+if [ -f "$CONFIG_FILE" ]; then
+  if command -v jq &>/dev/null; then
+    merged=$(jq -s '.[0] as $existing | .[1] as $fragment
+      | $existing * $fragment' "$CONFIG_FILE" "$FRAGMENT")
+    echo "$merged" > "$CONFIG_FILE"
+    echo "Merged agent config into $CONFIG_FILE"
+  else
+    echo "WARNING: jq not found. Add this to $CONFIG_FILE manually:"
+    cat "$FRAGMENT"
+  fi
+else
+  cp "$FRAGMENT" "$CONFIG_FILE"
+  echo "Created $CONFIG_FILE"
+fi
+
+echo ""
 echo "Installed. Restart OpenCode to activate."
 echo ""
-echo "Usage in OpenCode TUI:"
-echo '  "Ideal workflow: add JWT auth to the API"'
+echo "Model routing:"
+echo "  Plan (Tab)   → GLM-5.1 (read-only)"
+echo "  Build (Tab)  → MiniMax M2.7 (full access)"
+echo "  @ideal-review → Qwen3.6+ (read-only)"
 echo ""
-echo "Models used per phase:"
-echo "  Plan:   opencode/glm-5-1  (edit ~/.config/opencode/agents/ideal-plan.md to switch)"
-echo "  Build:  opencode/minimax-m2-7"
-echo "  Review: opencode/qwen-3-6-plus"
+echo "Review/debug/test keywords auto-route to @ideal-review."

@@ -1,29 +1,24 @@
 # ideal-workflow-opencode
 
-Three-phase **Plan → Build → Review** pipeline for OpenCode with automatic model switching.
+**Plan → Build → Review** pipeline with automatic model switching per mode.
 
-Uses the optimal model for each phase via OpenCode subagents:
+No trigger phrases needed. Just use OpenCode normally — models switch automatically based on the mode you're in.
 
-| Phase | Agent | Model |
-|-------|-------|-------|
-| Plan | `@ideal-plan` | GLM-5.1 or Kimi K2.6 |
-| Build | `@ideal-build` | MiniMax M2.7 or DeepSeek V4 Pro |
-| Review | `@ideal-review` | Qwen3.6 Plus |
+## Model routing
+
+| When you... | Mode | Model |
+|---|---|---|
+| Hit **Tab** to Plan mode | Plan | GLM-5.1 |
+| Start typing (Build mode) | Build | MiniMax M2.7 |
+| Say "review", "debug", "test", "check" | @ideal-review | Qwen3.6+ |
 
 ## How it works
 
-No plugins, no CLI commands. Just type in OpenCode TUI:
+Three mechanisms work together:
 
-```
-Ideal workflow: add JWT authentication to the API
-```
-
-The primary agent detects the trigger phrase via the `ideal-workflow` skill,
-then automatically:
-1. Invokes `@ideal-plan` (GLM-5.1) to produce an architecture plan
-2. Implements the feature itself (Build)
-3. Invokes `@ideal-review` (Qwen3.6 Plus) to audit code quality
-4. Fixes any blocking issues found
+1. **Built-in `plan` agent overridden** — uses GLM-5.1 + architecture prompt (read-only)
+2. **Built-in `build` agent overridden** — uses MiniMax M2.7 + implementation prompt
+3. **`@ideal-review` subagent** — Qwen3.6+ invoked automatically when you ask for review/debug/test
 
 ## Install
 
@@ -43,20 +38,21 @@ Restart OpenCode after installing.
 
 ## Customize models
 
-Edit the agent files in `~/.config/opencode/agents/` to change models:
+Edit `~/.config/opencode/opencode.json`:
 
-```yaml
-# ideal-plan.md — switch to Kimi K2.6
-model: opencode/kimi-k2-6
-
-# ideal-build.md — switch to DeepSeek V4 Pro
-model: opencode/deepseek-v4-pro
+```json
+{
+  "agent": {
+    "plan": { "model": "opencode/kimi-k2-6" },
+    "build": { "model": "opencode/deepseek-v4-pro" }
+  }
+}
 ```
 
 ## Requirements
 
-- OpenCode with Zen or Go plan (required models are only available via these plans)
-- Run `opencode /models` to verify model availability
+- OpenCode with Zen or Go plan
+- Run `opencode models opencode` to verify model availability
 
 ## Uninstall
 
@@ -64,17 +60,17 @@ model: opencode/deepseek-v4-pro
 curl -fsSL https://raw.githubusercontent.com/atakhadiviom/ideal-workflow-opencode/main/uninstall.sh | bash
 ```
 
-Or run `./uninstall.sh` from the cloned repo.
-
 ## Files
 
 ```
 ~/.config/opencode/
+├── opencode.json           # Agent overrides (plan + build models/prompts)
+├── prompts/
+│   ├── plan.txt            # Plan system prompt (read-only)
+│   └── build.txt           # Build system prompt (full access)
 ├── agents/
-│   ├── ideal-plan.md       # Plan subagent (read-only)
-│   ├── ideal-build.md      # Build subagent (full access)
-│   └── ideal-review.md     # Review subagent (read-only)
+│   └── ideal-review.md     # Review subagent (read-only, Qwen3.6+)
 └── skills/
     └── ideal-workflow/
-        └── SKILL.md        # Auto-detected orchestration skill
+        └── SKILL.md        # Auto-detected, routes debug/test/review
 ```
