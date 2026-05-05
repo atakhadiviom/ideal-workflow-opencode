@@ -28,13 +28,13 @@ then automatically:
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<your-org>/ideal-workflow-opencode/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/atakhadiviom/ideal-workflow-opencode/main/install.sh | bash
 ```
 
 Or clone and run manually:
 
 ```bash
-git clone https://github.com/<your-org>/ideal-workflow-opencode
+git clone https://github.com/atakhadiviom/ideal-workflow-opencode
 cd ideal-workflow-opencode
 ./install.sh
 ```
@@ -61,7 +61,7 @@ model: opencode/deepseek-v4-pro
 ## Uninstall
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<your-org>/ideal-workflow-opencode/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/atakhadiviom/ideal-workflow-opencode/main/uninstall.sh | bash
 ```
 
 Or run `./uninstall.sh` from the cloned repo.
