@@ -41,60 +41,76 @@ while IFS= read -r line; do
   MODEL_IDS+=("$line")
 done <<< "$MODELS"
 
-echo ""
-echo "Available models:"
-for i in "${!MODEL_IDS[@]}"; do
-  printf "  %2d) %s\n" $((i+1)) "${MODEL_IDS[$i]}"
-done
-echo ""
+# Detect if we're in pipe mode (curl|bash) — no terminal for select
+if [[ -z "${BASH_SOURCE[0]:-}" ]]; then
+  # Pipe mode: use recommended defaults, skip interactive select
+  PLAN_MODEL="opencode-go/glm-5.1"
+  BUILD_MODEL="opencode-go/minimax-m2.7"
+  REVIEW_MODEL="opencode-go/qwen3.6-plus"
+  echo ""
+  echo "  Pipe mode detected — using recommended defaults:"
+  echo "    Plan:   $PLAN_MODEL"
+  echo "    Build:  $BUILD_MODEL"
+  echo "    Review: $REVIEW_MODEL"
+  echo ""
+  echo "  To customize, run interactively:"
+  echo "    ~/.config/opencode/ideal-workflow-src/install.sh"
+else
+  echo ""
+  echo "Available models:"
+  for i in "${!MODEL_IDS[@]}"; do
+    printf "  %2d) %s\n" $((i+1)) "${MODEL_IDS[$i]}"
+  done
+  echo ""
 
-# -- Phase 1: Plan --
-echo "────────────────────────────────────────"
-echo "Select model for PLAN phase (architecture planning, read-only):"
-echo "  Recommended: opencode-go/glm-5.1"
-echo "  Alternative: opencode-go/kimi-k2.6"
-echo ""
-PS3="Pick a number for Plan: "
-select PLAN_MODEL in "${MODEL_IDS[@]}"; do
-  if [ -n "$PLAN_MODEL" ]; then
-    echo "  → Plan: $PLAN_MODEL"
-    break
-  fi
-done
+  # -- Phase 1: Plan --
+  echo "────────────────────────────────────────"
+  echo "Select model for PLAN phase (architecture planning, read-only):"
+  echo "  Recommended: opencode-go/glm-5.1"
+  echo "  Alternative: opencode-go/kimi-k2.6"
+  echo ""
+  PS3="Pick a number for Plan: "
+  select PLAN_MODEL in "${MODEL_IDS[@]}"; do
+    if [ -n "$PLAN_MODEL" ]; then
+      echo "  → Plan: $PLAN_MODEL"
+      break
+    fi
+  done
 
-echo ""
+  echo ""
 
-# -- Phase 2: Build --
-echo "────────────────────────────────────────"
-echo "Select model for BUILD phase (implementation, full access):"
-echo "  Recommended: opencode-go/minimax-m2.7"
-echo "  Alternative: opencode-go/deepseek-v4-pro"
-echo ""
-PS3="Pick a number for Build: "
-select BUILD_MODEL in "${MODEL_IDS[@]}"; do
-  if [ -n "$BUILD_MODEL" ]; then
-    echo "  → Build: $BUILD_MODEL"
-    break
-  fi
-done
+  # -- Phase 2: Build --
+  echo "────────────────────────────────────────"
+  echo "Select model for BUILD phase (implementation, full access):"
+  echo "  Recommended: opencode-go/minimax-m2.7"
+  echo "  Alternative: opencode-go/deepseek-v4-pro"
+  echo ""
+  PS3="Pick a number for Build: "
+  select BUILD_MODEL in "${MODEL_IDS[@]}"; do
+    if [ -n "$BUILD_MODEL" ]; then
+      echo "  → Build: $BUILD_MODEL"
+      break
+    fi
+  done
 
-echo ""
+  echo ""
 
-# -- Phase 3: Review --
-echo "────────────────────────────────────────"
-echo "Select model for REVIEW phase (code review, read-only):"
-echo "  Recommended: opencode-go/qwen3.6-plus"
-echo "  Alternative: opencode-go/qwen3.5-plus"
-echo ""
-PS3="Pick a number for Review: "
-select REVIEW_MODEL in "${MODEL_IDS[@]}"; do
-  if [ -n "$REVIEW_MODEL" ]; then
-    echo "  → Review: $REVIEW_MODEL"
-    break
-  fi
-done
+  # -- Phase 3: Review --
+  echo "────────────────────────────────────────"
+  echo "Select model for REVIEW phase (code review, read-only):"
+  echo "  Recommended: opencode-go/qwen3.6-plus"
+  echo "  Alternative: opencode-go/qwen3.5-plus"
+  echo ""
+  PS3="Pick a number for Review: "
+  select REVIEW_MODEL in "${MODEL_IDS[@]}"; do
+    if [ -n "$REVIEW_MODEL" ]; then
+      echo "  → Review: $REVIEW_MODEL"
+      break
+    fi
+  done
 
-echo ""
+  echo ""
+fi
 
 # --- Confirm ---
 echo "╔══════════════════════════════════════════╗"
