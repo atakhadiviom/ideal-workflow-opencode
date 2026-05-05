@@ -20,11 +20,9 @@ single session — model switching is transparent.
 
 ## When to use me
 
-Use this when the user's message starts with or contains any of:
-- "ideal workflow"
-- "pipeline:"
-- "full stack:"
-- "plan, build, review"
+Use this for EVERY feature implementation the user asks for.
+Do NOT wait for a trigger phrase — any request to build, add, or change code
+should run through this pipeline.
 
 ## Workflow
 
