@@ -1,8 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
+
+# Resolve REPO_DIR: local execution vs curl|bash (pipe mode)
+if [[ -n "${BASH_SOURCE[0]:-}" ]]; then
+  REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+else
+  # Pipe mode — clone the repo for file access
+  if ! command -v git &>/dev/null; then
+    echo "ERROR: git is required for curl|bash install. Install git or run locally."
+    exit 1
+  fi
+  CLONE_DIR="$CONFIG_DIR/ideal-workflow-src"
+  if [[ -d "$CLONE_DIR/.git" ]]; then
+    git -C "$CLONE_DIR" pull --ff-only 2>/dev/null || true
+  else
+    rm -rf "$CLONE_DIR"
+    git clone --depth 1 https://github.com/atakhadiviom/ideal-workflow-opencode.git "$CLONE_DIR"
+  fi
+  REPO_DIR="$CLONE_DIR"
+fi
 
 echo "╔══════════════════════════════════════════╗"
 echo "║  ideal-workflow-opencode installer       ║"
