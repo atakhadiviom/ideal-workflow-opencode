@@ -3,10 +3,14 @@ set -euo pipefail
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
 
+# Detect pipe mode: [[ -t 0 ]] is false when stdin is not a terminal (curl|bash)
+IS_PIPE=false
+if [[ ! -t 0 ]]; then
+  IS_PIPE=true
+fi
+
 # Resolve REPO_DIR: local execution vs curl|bash (pipe mode)
-if [[ -n "${BASH_SOURCE[0]:-}" ]]; then
-  REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-else
+if $IS_PIPE; then
   # Pipe mode — clone the repo for file access
   if ! command -v git &>/dev/null; then
     echo "ERROR: git is required for curl|bash install. Install git or run locally."
@@ -20,6 +24,8 @@ else
     git clone --depth 1 https://github.com/atakhadiviom/ideal-workflow-opencode.git "$CLONE_DIR"
   fi
   REPO_DIR="$CLONE_DIR"
+else
+  REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 fi
 
 echo "╔══════════════════════════════════════════╗"
@@ -42,7 +48,7 @@ while IFS= read -r line; do
 done <<< "$MODELS"
 
 # Detect if we're in pipe mode (curl|bash) — no terminal for select
-if [[ -z "${BASH_SOURCE[0]:-}" ]]; then
+if $IS_PIPE; then
   # Pipe mode: use recommended defaults, skip interactive select
   PLAN_MODEL="opencode-go/glm-5.1"
   BUILD_MODEL="opencode-go/minimax-m2.7"
