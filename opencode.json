@@ -9,7 +9,7 @@
     },
     "build": {
       "model": "opencode/minimax-m2-7",
-      "prompt": "{file:~/.config/opencode/prompts/build.txt"}
+      "prompt": "{file:~/.config/opencode/prompts/build.txt}"
     }
   }
 }
