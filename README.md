@@ -6,18 +6,18 @@ No trigger phrases needed. Just use OpenCode normally — models switch automati
 
 ## Model routing
 
-| When you... | Mode | Model |
-|---|---|---|
-| Hit **Tab** to Plan mode | Plan | GLM-5.1 |
-| Start typing (Build mode) | Build | MiniMax M2.7 |
-| Say "review", "debug", "test", "check" | @ideal-review | Qwen3.6+ |
+| When you... | Mode | Default | Alternative |
+|---|---|---|---|
+| Hit **Tab** to Plan mode | Plan | GLM-5.1 | Kimi K2.6 |
+| Start typing (Build mode) | Build | MiniMax M2.7 | DeepSeek V4 Pro |
+| Say "review", "debug", "test", "check" | @ideal-review | Qwen3.6+ | — |
 
 ## How it works
 
 Three mechanisms work together:
 
-1. **Built-in `plan` agent overridden** — uses GLM-5.1 + architecture prompt (read-only)
-2. **Built-in `build` agent overridden** — uses MiniMax M2.7 + implementation prompt
+1. **Built-in `plan` agent overridden** — uses GLM-5.1 (or Kimi K2.6) + architecture prompt (read-only)
+2. **Built-in `build` agent overridden** — uses MiniMax M2.7 (or DeepSeek V4 Pro) + implementation prompt
 3. **`@ideal-review` subagent** — Qwen3.6+ invoked automatically when you ask for review/debug/test
 
 ## Install
