@@ -1,49 +1,55 @@
 # ideal-workflow-opencode
 
-Interactive model selector for OpenCode's Plan → Build → Review pipeline.
-
-When you install, it asks you to pick a model for each phase from all your
-available OpenCode Go models.
+Wire OpenCode's Plan → Build → Review pipeline to the best available OpenCode Go models — installed in one command, customizable anytime.
 
 ## Model routing
 
-| Mode | Model |
-|---|---|
-| Plan (Tab) | Your pick (e.g. GLM-5.1, Kimi K2.6) |
-| Build (Tab) | Your pick (e.g. MiniMax M2.7, DeepSeek V4 Pro) |
-| Review/Debug/Test | Your pick (e.g. Qwen3.6+) |
+| Phase | Trigger | Default (pipe install) |
+|---|---|---|
+| Plan | Tab | `opencode-go/glm-5.1` |
+| Build | Default | `opencode-go/minimax-m2.7` |
+| Review / Debug / Test | Say "review this" | `opencode-go/qwen3.6-plus` |
 
 ## Install
+
+**One-liner (pipe mode)** — uses recommended defaults, no prompts:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/atakhadiviom/ideal-workflow-opencode/main/install.sh | bash
 ```
 
-You'll be prompted to pick a model for each phase from your available models.
+**Interactive** — pick a model for each phase from your available models:
 
-Re-run anytime to swap models.
+```bash
+~/.config/opencode/ideal-workflow-src/install.sh
+```
+
+Re-run the interactive installer anytime to swap models.
 
 ## How it works
 
 - Built-in `plan` agent overridden with your chosen model + architecture prompt
 - Built-in `build` agent overridden with your chosen model + implementation prompt
-- `ideal-review` subagent invoked automatically when you say "review", "debug", "test"
+- `ideal-review` subagent invoked automatically when you say "review", "debug", or "test"
 - Skill auto-detected — no trigger phrases needed
 
 ## Requirements
 
 - OpenCode Go plan (models are on the `opencode-go` provider)
-- Run `opencode models opencode-go` to see available models
+- `git` must be available for the one-liner install
+- Run `opencode models opencode-go` to see your available models
 
 ## Files
 
 ```
 ~/.config/opencode/
-├── opencode.json           # Generated config with your model picks
+├── opencode.json              # Generated config with your model picks
 ├── prompts/
-│   ├── plan.txt            # Plan system prompt
-│   └── build.txt           # Build system prompt
-└── skills/
-    └── ideal-workflow/
-        └── SKILL.md        # Routes debug/test/review to ideal-review
+│   ├── plan.txt               # Plan phase system prompt
+│   └── build.txt              # Build phase system prompt
+├── skills/
+│   └── ideal-workflow/
+│       └── SKILL.md           # Routes debug/test/review to ideal-review
+└── ideal-workflow-src/        # Cloned repo (used by pipe-mode install)
+    └── install.sh             # Re-run to change models interactively
 ```
