@@ -11,6 +11,9 @@ rm -f "$CONFIG_DIR/prompts/plan.txt" "$CONFIG_DIR/prompts/build.txt"
 # Remove skill
 rm -rf "$CONFIG_DIR/skills/ideal-workflow"
 
+# Remove auto-cloned repo (from curl|bash install)
+rm -rf "$CONFIG_DIR/ideal-workflow-src"
+
 # Remove agent config from opencode.json
 CONFIG_FILE="$CONFIG_DIR/opencode.json"
 if [ -f "$CONFIG_FILE" ]; then
